@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import TodoList from "./components/TodoList";
 
 export default function Home() {
   const [tasks, setTasks] = useState([]);
@@ -26,8 +27,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      Todo list app
-    </main>
+    <div className="border-5 border-black">
+      {/* Todo list app */}
+      <TodoList />
+    </div>
   );
 }
