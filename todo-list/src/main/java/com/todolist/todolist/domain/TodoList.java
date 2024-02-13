@@ -15,7 +15,7 @@ public class TodoList {
     private String taskName;
 
     @Column(name = "is_completed", nullable = true)
-    private Boolean isCompleted;
+    private Boolean isCompleted = false;
 
     public TodoList() {
 
