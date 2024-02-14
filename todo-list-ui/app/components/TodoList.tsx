@@ -37,6 +37,7 @@ const TodoList = () => {
   if (error) return <div>Error: {error}</div>;
 
   const handleCreateTask = async (taskTitle: string) => {
+    console.log("you call me");
     try {
       await axios.post("http://localhost:8080/api", {
         taskName: taskTitle,
@@ -45,7 +46,8 @@ const TodoList = () => {
       mutate();
       toast.success("Task created successfully");
     } catch (error) {
-      toast.error("An error occurred");
+      console.log(error);
+      toast.error(`${(error as any)?.response?.data?.message}`);
     }
   };
 
@@ -106,9 +108,6 @@ const TodoList = () => {
             </DialogHeader>
             <div className="flex items-center space-x-2">
               <div className="grid flex-1 gap-2">
-                <Label htmlFor="link" className="sr-only">
-                  Link
-                </Label>
                 <Input
                   id="EditTask"
                   defaultValue={taskTitle}
@@ -122,17 +121,19 @@ const TodoList = () => {
                   size="sm"
                   className="px-3"
                   disabled={taskTitle.trim().length === 0}
+                  onClick={() => handleCreateTask(taskTitle)}
                 >
-                  <Check
-                    className="h-4 w-4"
-                    onClick={() => handleCreateTask(taskTitle)}
-                  />
+                  <Check className="h-4 w-4" />
                 </Button>
               </DialogClose>
             </div>
             <DialogFooter className="sm:justify-start">
               <DialogClose asChild>
-                <Button type="button" variant="secondary">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setTaskTitle("")}
+                >
                   Close
                 </Button>
               </DialogClose>

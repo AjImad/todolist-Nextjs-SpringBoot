@@ -24,7 +24,7 @@ const Task = ({ taskTitle, taskId, taskDone, revalidateTasks }: TaskProps) => {
       revalidateTasks();
       toast.success("Task deleted successfully");
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(`${(error as any)?.response?.data?.message}`);
     }
   };
 
@@ -36,7 +36,7 @@ const Task = ({ taskTitle, taskId, taskDone, revalidateTasks }: TaskProps) => {
       toast.success("Task updated successfully");
       revalidateTasks();
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(`${(error as any)?.response?.data?.message}`);
     }
   };
 
