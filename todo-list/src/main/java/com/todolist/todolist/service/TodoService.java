@@ -4,6 +4,7 @@ import com.todolist.todolist.domain.TodoList;
 import com.todolist.todolist.repository.TodoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -22,7 +23,7 @@ public class TodoService {
     }
 
     public List<TodoList> display(){
-        return todoRepository.findAll();
+        return todoRepository.findAll(Sort.by("id"));
     }
 
 
