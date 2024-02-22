@@ -31,4 +31,6 @@ public class TodoConfig implements WebMvcConfigurer {
             todoRepository.saveAll(List.of(task1, task2));
         };
     }
+
+
 }
