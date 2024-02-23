@@ -32,6 +32,10 @@ public class SecurityConfiguration {
                 )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
+                // UsernamePasswordAuthenticationFilter is a standard filter provided by spring security that intercepts
+                // login request (Post request, /login) also called the form login filter.
+                // By placing jwtAuthFilter before the form login filter we make sure that JWT tokens are checked
+                // before the application tries to process any username/password authentication.
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
