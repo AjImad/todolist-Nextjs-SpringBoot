@@ -3,8 +3,10 @@ package com.todolist.todolist.config;
 import com.todolist.todolist.user.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,6 +41,13 @@ public class ApplicationConfig {
         // provided during the login process, it ensures that the passwords are stored and compared in secure manner.
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+        // AuthenticationManager designed to be a gateway for the authentication request, it delegates this
+        // authentication request to one or more authentication provider
+        return config.getAuthenticationManager(); // retrieve the authentication manager instance
     }
 
     @Bean
