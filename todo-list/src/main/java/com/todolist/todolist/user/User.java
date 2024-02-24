@@ -1,10 +1,12 @@
 package com.todolist.todolist.user;
 
+import com.todolist.todolist.token.Token;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "_user", uniqueConstraints = {
@@ -29,6 +31,9 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
     public User() {
     }
 
@@ -44,6 +49,10 @@ public class User implements UserDetails{
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     @Override
