@@ -48,7 +48,13 @@ public class AuthenticationService {
         userRepository.save(user);
         String jwt = jwtService.generateToken(user);
         saveUserToken(jwt, user);
-        return new AuthenticationResponse(jwt);
+        return new AuthenticationResponse(
+                user.getId(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmail(),
+                jwt
+        );
     }
 
     private void saveUserToken(String jwt, User user) {
@@ -74,7 +80,13 @@ public class AuthenticationService {
         revokeAllValidTokens(storedUser);
         String jwt = jwtService.generateToken(storedUser);
         saveUserToken(jwt, storedUser);
-        return new AuthenticationResponse(jwt);
+        return new AuthenticationResponse(
+                storedUser.getId(),
+                storedUser.getFirstname(),
+                storedUser.getLastname(),
+                storedUser.getEmail(),
+                jwt
+        );
     }
 
     public void revokeAllValidTokens(User user){
