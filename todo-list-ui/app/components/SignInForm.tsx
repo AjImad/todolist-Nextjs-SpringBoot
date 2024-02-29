@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,6 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { Noto_Sans_Cham } from "next/font/google";
+import { Toaster, toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 const notoSansCham = Noto_Sans_Cham({ subsets: ["latin"] });
 
@@ -33,8 +36,22 @@ const SignInForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const res = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+    console.log("res from submit form: ", res);
+    // try {
+    //   const response = await axios.post(
+    //     "http://localhost:8080/api/auth/authenticate",
+    //     values
+    //   );
+    //   console.log("response: ", response.data);
+    // } catch (error: any) {
+    //   toast.error(`${error.response.data.detail}`);
+    // }
   };
 
   return (
@@ -91,6 +108,7 @@ const SignInForm = () => {
           </Button>
         </form>
       </Form>
+      <Toaster position="bottom-right" />
     </div>
   );
 };

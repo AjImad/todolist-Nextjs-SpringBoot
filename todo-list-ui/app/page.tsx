@@ -1,21 +1,26 @@
-import Image from "next/image";
-import SignInForm from "./components/SignInForm";
+"use client";
+
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import TodoList from "./components/TodoList";
+import Spinner from "@/components/spinner";
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  console.log("session: ", { session });
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size="icon" />
+      </div>
+    );
+  }
+  if (status === "unauthenticated") {
+    redirect("/auth/signin");
+  }
   return (
-    <div className="w-[800px] h-[400px] flex">
-      <div className="w-[100%] flex justify-center items-center bg-white shadow-lg py-3 rounded-tl rounded-bl">
-        <SignInForm />
-      </div>
-      <div className="w-[100%]">
-        <Image
-          src={"/todo-image.png"}
-          width={600}
-          height={800}
-          alt="Todo Image"
-          className="object-cover rounded-tr rounded-br"
-        />
-      </div>
+    <div>
+      <TodoList />
     </div>
   );
 }

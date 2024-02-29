@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter as FontSans } from "next/font/google";
 
 import { cn } from "@/lib/utils";
+import SessionWrapper from "./components/SessionWrapper";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -20,15 +21,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={cn(
-          "min-h-screen border-5 border-black bg-background font-sans antialiased flex justify-center p-24",
-          fontSans.variable
-        )}
-      >
-        {children}
-      </body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased flex justify-center items-center",
+            fontSans.variable
+          )}
+        >
+          {children}
+        </body>
+      </html>
+    </SessionWrapper>
   );
 }
