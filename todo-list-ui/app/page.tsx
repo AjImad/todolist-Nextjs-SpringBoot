@@ -7,7 +7,7 @@ import Spinner from "@/components/spinner";
 
 export default function Home() {
   const { data: session, status } = useSession();
-  console.log("session: ", { session });
+  console.log("token: ", session?.user?.token);
   if (status === "loading") {
     return (
       <div className="flex justify-center items-center h-screen">

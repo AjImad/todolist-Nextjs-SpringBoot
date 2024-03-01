@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Task from "./Task";
 import useSWR from "swr";
+import { BareFetcher } from "swr";
 import Spinner from "@/components/spinner";
 import Image from "next/image";
 import {
@@ -22,15 +23,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
+import axiosInstance from "@/lib/axiosInstance";
 
 const TodoList = () => {
-  const fetcher = (url: any) => fetch(url).then((res) => res.json());
+
+  const fetcher = async (url: string) => {
+    const response = await axiosInstance.get(url);
+    return response.data;
+  };
 
   const [taskTitle, setTaskTitle] = useState<string>("");
 
   const { data, error, isLoading, mutate } = useSWR(
-    "http://localhost:8080/api/tasks",
+    "/tasks",
     fetcher
   );
 
@@ -39,7 +44,7 @@ const TodoList = () => {
   const handleCreateTask = async (taskTitle: string) => {
     console.log("you call me");
     try {
-      await axios.post("http://localhost:8080/api", {
+      await axiosInstance.post("", {
         taskName: taskTitle,
       });
       setTaskTitle("");

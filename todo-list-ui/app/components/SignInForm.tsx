@@ -17,10 +17,12 @@ import { Lock, Mail } from "lucide-react";
 import { Noto_Sans_Cham } from "next/font/google";
 import { Toaster, toast } from "sonner";
 import { signIn } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
 
 const notoSansCham = Noto_Sans_Cham({ subsets: ["latin"] });
 
 const SignInForm = () => {
+  const router = useRouter();
   const formSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6, {
@@ -37,12 +39,22 @@ const SignInForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const res = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-    console.log("res from submit form: ", res);
+    try{
+      const res = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+      if(res?.error){
+        toast.error(res.error);
+      } else {
+        toast.success("Sign-in success");
+        router.push("/");
+      }
+    } catch(error){
+      toast.error("Error during sign-in");
+    }
+    
     // try {
     //   const response = await axios.post(
     //     "http://localhost:8080/api/auth/authenticate",
@@ -82,6 +94,7 @@ const SignInForm = () => {
                   />
                 </FormControl>
                 <FormMessage />
+                {/* <p className="h-4"> {form.formState.errors.email?.message} </p> */}
               </FormItem>
             )}
           />

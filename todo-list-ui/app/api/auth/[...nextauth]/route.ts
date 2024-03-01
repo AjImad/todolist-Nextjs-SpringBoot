@@ -16,7 +16,7 @@ const handler = NextAuth({
             email: string;
             password: string;
           };
-          const response = await fetch(
+          const res = await fetch(
             "http://localhost:8080/api/auth/authenticate",
             {
               method: "POST",
@@ -29,22 +29,33 @@ const handler = NextAuth({
               }),
             }
           );
-          const user = await response.json();
-
-          console.log("user: ", { user });
-          if (user) {
-            return user;
-          } else {
-            console.log("user: ", { user });
-            return null;
+          if(res.ok){
+            const user = await res.json();
+            if(user?.token){
+              return user;
+            }      
           }
-        } catch (e) {
-          console.log("error from route.ts: ", e);
-          return e;
+          // If response is not ok or does not contain a user token
+          const errorResponse = await res.json();
+          return Promise.reject(new Error(errorResponse?.detail));
+          // throw new Error(errorResponse?.detail);
+       
+        } catch (e: any) {
+          // throw new Error(e?.message);
+          return Promise.reject(new Error(e?.message));
         }
       },
     }),
   ],
+  callbacks: {
+    async jwt ({token, user}){
+      return {...token, ...user};
+    },
+    async session({session, token, user}){
+      session.user = token as any;
+      return session;
+    }
+  },
   pages: {
     signIn: "/auth/signin",
     // error: '/auth/error',
