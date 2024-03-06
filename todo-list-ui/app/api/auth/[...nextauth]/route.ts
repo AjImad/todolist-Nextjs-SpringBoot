@@ -31,8 +31,8 @@ const handler = NextAuth({
           );
           if(res.ok){
             const user = await res.json();
-            console.log("user: ", user);
-            if(user?.token){
+            if(user?.access_token && user?.refresh_token){
+              console.log("user returned: ", user);
               return user;
             }      
           }
@@ -50,11 +50,12 @@ const handler = NextAuth({
   ],
   callbacks: {
     async jwt ({token, user}){
+      console.log("token: ", token);
       if(Date.now() > (token.exp as number)){
         // Token has expired, remove token
-        return {...token, userAuthenticated: false, exp: 0};
+        return {...token, userAuthenticated: false};
       }
-      return {...token};
+      return {...token, ...user};
     },
     async session({session, token, user}){
       session.user = token as any;
@@ -64,7 +65,7 @@ const handler = NextAuth({
   pages: {
     signIn: "/auth/signin",
     // error: '/auth/error',
-    // signOut: '/auth/signout'
+    signOut: '/auth/signin'
   },
 });
 

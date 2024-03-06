@@ -6,8 +6,7 @@ import TodoList from "./components/TodoList";
 import Spinner from "@/components/spinner";
 
 export default function Home() {
-  const {  status } = useSession();
-  const session = useSession();
+  const {  data: session, status } = useSession();
   console.log("token jwt session: ", session);
   console.log("status: ", status)
   if (status === "loading") {

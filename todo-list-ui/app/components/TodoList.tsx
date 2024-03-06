@@ -1,35 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import Task from "./Task";
-import useSWR from "swr";
-import { BareFetcher } from "swr";
 import Spinner from "@/components/spinner";
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Check } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import useAxiosAuth from "@/lib/hooks/useAxiosAuth";
+import { Check, Plus } from "lucide-react";
+import { signOut } from "next-auth/react";
+import Image from "next/image";
+import { useState } from "react";
 import { toast } from "sonner";
-import axiosInstance from "@/lib/axiosInstance";
+import useSWR from "swr";
+import Task from "./Task";
 
 const TodoList = () => {
 
+  const axiosAuth = useAxiosAuth();
   const fetcher = async (url: string) => {
-    const response = await axiosInstance.get(url);
-    return response.data;
+    try{
+      const response = await axiosAuth.get(url);
+      return response.data;
+    } catch(error){
+      signOut();
+    }
   };
 
   const [taskTitle, setTaskTitle] = useState<string>("");
@@ -41,16 +44,14 @@ const TodoList = () => {
   if (error) return <div>Error: {error}</div>;
 
   const handleCreateTask = async (taskTitle: string) => {
-    console.log("you call me");
     try {
-      await axiosInstance.post("", {
+      await axiosAuth.post("", {
         taskName: taskTitle,
       });
       setTaskTitle("");
       mutate();
       toast.success("Task created successfully");
     } catch (error) {
-      console.log(error);
       toast.error(`${(error as any)?.response?.data?.message}`);
     }
   };
@@ -64,7 +65,7 @@ const TodoList = () => {
           <div className="flex justify-center items-center h-[100%]">
             <Spinner size="icon" />
           </div>
-        ) : data.length > 0 ? (
+        ) : data?.length > 0 ? (
           data?.map((task: any) => (
             <Task
               key={task.id}
@@ -91,7 +92,7 @@ const TodoList = () => {
       <Separator orientation="horizontal" className="mb-2" />
       <div className="flex justify-between items-center p-4 uppercase">
         <p className="flex justify-between items-center">
-          {isLoading ? "-" : data.length} Tasks
+          {isLoading ? "-" : data?.length} Tasks
         </p>{" "}
         <Dialog>
           <DialogTrigger asChild>
