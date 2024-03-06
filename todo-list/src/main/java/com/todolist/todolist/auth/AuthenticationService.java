@@ -1,17 +1,24 @@
 package com.todolist.todolist.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.todolist.todolist.config.JwtService;
 import com.todolist.todolist.token.Token;
 import com.todolist.todolist.token.TokenRepository;
 import com.todolist.todolist.user.User;
 import com.todolist.todolist.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -47,13 +54,15 @@ public class AuthenticationService {
         );
         userRepository.save(user);
         String jwt = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(jwt, user);
         return new AuthenticationResponse(
                 user.getId(),
                 user.getFirstname(),
                 user.getLastname(),
                 user.getEmail(),
-                jwt
+                jwt,
+                refreshToken
         );
     }
 
@@ -79,13 +88,15 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with email not found!"));
         revokeAllValidTokens(storedUser);
         String jwt = jwtService.generateToken(storedUser);
+        String refreshToken = jwtService.generateRefreshToken(storedUser);
         saveUserToken(jwt, storedUser);
         return new AuthenticationResponse(
                 storedUser.getId(),
                 storedUser.getFirstname(),
                 storedUser.getLastname(),
                 storedUser.getEmail(),
-                jwt
+                jwt,
+                refreshToken
         );
     }
 
@@ -99,5 +110,29 @@ public class AuthenticationService {
             t.setRevoked(true);
         });
         tokenRepository.saveAll(tokens);
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+            if(authHeader == null || !authHeader.startsWith("Bearer")){
+                return;
+            }
+            final String refreshToken = authHeader.substring(7);
+            final String userEmail = jwtService.extractUserName(refreshToken);
+
+            if(userEmail != null){
+                var user = userRepository.findUserByEmail(userEmail).orElseThrow();
+
+                if(jwtService.isTokenValid(refreshToken, user)){
+                    var accessToken = jwtService.generateToken(user);
+                    revokeAllValidTokens(user);
+                    saveUserToken(accessToken, user);
+                    var authResponse = new AuthenticationResponse(refreshToken, accessToken);
+
+                    // Return the response to the user using ObjectMapper
+                    new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+                }
+
+            }
     }
 }

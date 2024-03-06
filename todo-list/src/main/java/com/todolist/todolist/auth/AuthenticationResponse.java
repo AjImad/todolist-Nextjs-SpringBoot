@@ -1,5 +1,6 @@
 package com.todolist.todolist.auth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -8,16 +9,28 @@ public class AuthenticationResponse {
     private String firstname;
     private String lastname;
     private String email;
-    private String token;
+    @JsonProperty(value = "access_token")
+    private String accessToken;
+    @JsonProperty(value = "refresh_token")
+    private String refreshToken;
+
 
     public AuthenticationResponse(){}
 
-    public AuthenticationResponse(Integer id, String firstname, String lastname, String email, String token) {
+    public AuthenticationResponse(String refreshToken, String accessToken) {
+        this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
+    }
+
+    public AuthenticationResponse(Integer id, String firstname, String lastname, String email, String accessToken,
+                                  String refreshToken
+    ) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.token = token;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     public String getFirstname() {
@@ -36,7 +49,11 @@ public class AuthenticationResponse {
         return email;
     }
 
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }
