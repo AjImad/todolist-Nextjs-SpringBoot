@@ -38,7 +38,6 @@ const TodoList = () => {
     "/tasks",
     fetcher
   );
-
   if (error) return <div>Error: {error}</div>;
 
   const handleCreateTask = async (taskTitle: string) => {

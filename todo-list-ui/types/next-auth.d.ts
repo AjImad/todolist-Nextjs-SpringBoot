@@ -14,6 +14,7 @@ declare module "next-auth" {
         firstname?: string,
         lastname?: string,
         email?: string,
-        token?: string
+        token?: string,
+        exp?: number
     }
 }
