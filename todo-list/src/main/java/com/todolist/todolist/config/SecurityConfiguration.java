@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
@@ -25,6 +26,8 @@ public class SecurityConfiguration {
     @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver exceptionResolver;
 
+    private final LogoutHandler logoutHandler;
+
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
@@ -32,8 +35,12 @@ public class SecurityConfiguration {
         return new JwtAuthenticationFilter(exceptionResolver);
     }
 
-    public SecurityConfiguration (AuthenticationProvider authenticationProvider){
+    public SecurityConfiguration (
+            AuthenticationProvider authenticationProvider,
+            LogoutHandler logoutHandler
+    ){
         this.authenticationProvider = authenticationProvider;
+        this.logoutHandler = logoutHandler;
     }
 
     @Bean
@@ -51,7 +58,12 @@ public class SecurityConfiguration {
                 // login request (Post request, /login) also called the form login filter.
                 // By placing jwtAuthFilter before the form login filter we make sure that JWT tokens are checked
                 // before the application tries to process any username/password authentication.
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+                    .logout((logout) -> logout
+                            .logoutUrl("/api/auth/logout")
+                            .addLogoutHandler(logoutHandler)
+                            .logoutSuccessHandler((request, response, authenticate) -> SecurityContextHolder.clearContext())
+                    );
 
             return http.build();
     }
