@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# application properties file
+/home/ajbar-imad/github/todolist-Nextjs-SpringBoot/todo-list/src/main/resources/application.properties
