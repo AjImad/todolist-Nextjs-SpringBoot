@@ -54,16 +54,6 @@ const SignInForm = () => {
     } catch(error){
       toast.error("Error during sign-in");
     }
-    
-    // try {
-    //   const response = await axios.post(
-    //     "http://localhost:8080/api/auth/authenticate",
-    //     values
-    //   );
-    //   console.log("response: ", response.data);
-    // } catch (error: any) {
-    //   toast.error(`${error.response.data.detail}`);
-    // }
   };
 
   return (

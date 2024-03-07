@@ -45,7 +45,7 @@ const TodoList = () => {
 
   const handleCreateTask = async (taskTitle: string) => {
     try {
-      await axiosAuth.post("", {
+      await axiosAuth.post("/create-task", {
         taskName: taskTitle,
       });
       setTaskTitle("");

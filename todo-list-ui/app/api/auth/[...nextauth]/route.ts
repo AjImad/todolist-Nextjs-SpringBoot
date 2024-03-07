@@ -32,7 +32,6 @@ const handler = NextAuth({
           if(res.ok){
             const user = await res.json();
             if(user?.access_token && user?.refresh_token){
-              console.log("user returned: ", user);
               return user;
             }      
           }
@@ -50,7 +49,6 @@ const handler = NextAuth({
   ],
   callbacks: {
     async jwt ({token, user}){
-      console.log("token: ", token);
       if(Date.now() > (token.exp as number)){
         // Token has expired, remove token
         return {...token, userAuthenticated: false};

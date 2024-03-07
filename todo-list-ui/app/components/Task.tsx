@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import useAxiosAuth from "@/lib/hooks/useAxiosAuth";
 import { cn } from "@/lib/utils";
-import axios from "axios";
 import { Trash } from "lucide-react";
 import { useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
@@ -17,10 +17,11 @@ const Task = ({ taskTitle, taskId, taskDone, revalidateTasks }: TaskProps) => {
   const [updatedTaskTitle, setUpdatedTaskTitle] = useState<String>(taskTitle);
   const [isEditing, setIsEditing] = useState(false);
   const isTaskDone = useRef(taskDone);
+  const axiosAuth = useAxiosAuth();
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:8080/api/${id}`);
+      await axiosAuth.delete(`http://localhost:8080/api/${id}`);
       revalidateTasks();
       toast.success("Task deleted successfully");
     } catch (error) {
@@ -30,7 +31,10 @@ const Task = ({ taskTitle, taskId, taskDone, revalidateTasks }: TaskProps) => {
 
   const handleUpdateTask = async (id: string) => {
     try {
-      await axios.put(
+      if(isTaskDone.current === true){
+        isTaskDone.current = false;
+      }
+      await axiosAuth.put(
         `http://localhost:8080/api/${id}?taskTitle=${updatedTaskTitle}&&isCompleted=${isTaskDone.current}`
       );
       toast.success("Task updated successfully");
