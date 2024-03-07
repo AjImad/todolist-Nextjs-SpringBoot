@@ -6,7 +6,7 @@ import TodoList from "./components/TodoList";
 import Spinner from "@/components/spinner";
 
 export default function Home() {
-  const {  data: session, status } = useSession();
+  const { status } = useSession();
   if (status === "loading") {
     return (
       <div className="flex justify-center items-center h-screen">
