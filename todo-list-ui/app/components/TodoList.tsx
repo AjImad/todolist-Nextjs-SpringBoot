@@ -1,6 +1,7 @@
 "use client";
 
 import Spinner from "@/components/spinner";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,11 +13,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import useAxiosAuth from "@/lib/hooks/useAxiosAuth";
 import { Check, Plus } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,23 +34,20 @@ import useSWR from "swr";
 import Task from "./Task";
 
 const TodoList = () => {
-
   const axiosAuth = useAxiosAuth();
   const fetcher = async (url: string) => {
-    try{
+    try {
       const response = await axiosAuth.get(url);
       return response.data;
-    } catch(error){
+    } catch (error) {
       signOut();
     }
   };
 
   const [taskTitle, setTaskTitle] = useState<string>("");
+  const { data: session } = useSession();
 
-  const { data, error, isLoading, mutate } = useSWR(
-    "/tasks",
-    fetcher
-  );
+  const { data, error, isLoading, mutate } = useSWR("/tasks", fetcher);
   if (error) return <div>Error: {error}</div>;
 
   const handleCreateTask = async (taskTitle: string) => {
@@ -56,9 +63,42 @@ const TodoList = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axiosAuth.post("/auth/logout");
+      signOut();
+    } catch (error) {
+      toast.error(`${(error as any)?.response?.data?.message}`);
+    }
+  };
+
   return (
     <div className="w-[450px] bg-white shadow-lg py-3 rounded">
-      <h3 className="text-center py-4 uppercase font-bold">Today's Task</h3>
+      <div className="flex justify-between items-center px-2">
+        <h3 className="text-center py-4 uppercase font-bold">Today's Task</h3>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex space-x-2">
+              <Avatar className="h-7 w-7">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                />
+              </Avatar>
+              <p>{`${session?.user?.firstname} ${session?.user?.lastname}`}</p>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              Log out
+              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <Separator orientation="horizontal" className="mb-2" />
       <div className="h-[400px] overflow-y-auto p-2">
         {isLoading ? (
