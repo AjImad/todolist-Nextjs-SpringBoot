@@ -24,7 +24,7 @@ public class TodoController {
         return todoService.display();
     }
 
-    @PostMapping
+    @PostMapping("/create-task")
     public TodoList addTask(@RequestBody TodoList todoList) {
         return todoService.addTask(todoList);
     }
